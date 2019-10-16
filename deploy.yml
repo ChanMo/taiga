@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+    postgres:
+        image: postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./pgdata:/var/lib/postgresql/data/
+
+    api:
+        build: ./api
+        volumes:
+            - ./api:/app
+            #- ./backend/local.py:/usr/src/app/taiga/project/local.py
+        links:
+            - postgres:postgres
+        ports:
+            - "8000:8000"
+        command: gunicron taiga.wagi:application -w 4 -b :8000
+
+
+    web:
+        build: ./web
+        volumes:
+            - ./web:/app
+        links:
+            - api:api
+        ports:
+            - "9001:9001"
+        command: gulp deploy
+
+        #event:
+        #    build: ./events
+        #    volumes:
+        #        - ./events/config.json:/app/taiga/config.json
+        #    command: node_modules/coffeescript/bin/coffee index.coffee
