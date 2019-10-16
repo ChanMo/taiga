@@ -1,0 +1,18 @@
+FROM ubuntu:16.04
+
+WORKDIR /app
+
+RUN apt-get -y update
+RUN apt -y install software-properties-common
+RUN apt-add-repository ppa:brightbox/ruby-ng
+RUN apt-get -y update && apt-get install -y ruby2.4 ruby2.4-dev gcc make curl git
+RUN curl --silent --location https://deb.nodesource.com/setup_8.x | bash -
+RUN apt-get -y install nodejs build-essential
+
+ENV PATH="/root/.gem/ruby/2.4.0/bin:${PATH}"
+
+RUN gem install --user-install sass scss_lint
+RUN npm install -g gulp
+
+COPY . /app
+RUN npm install
